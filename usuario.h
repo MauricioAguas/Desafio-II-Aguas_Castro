@@ -1,51 +1,37 @@
-#ifndef USUARIO_H
-#define USUARIO_H
-
-#include "Elemento.h"
+#pragma once
 #include <string>
-#include <sstream>
 using namespace std;
 
-class Usuario : public Elemento {
+class Usuario {
 protected:
-    string nickname;     // nombre de usuario único
+    int id;
+    string nickname;
     string ciudad;
     string pais;
-    string fechaRegistro; // formato: "YYYY-MM-DD" o similar
+    string fechaRegistro;
+    string tipo;
+
+    // Nuevo campo temporal para vincular luego
+    int idSeguidoTemporal;
 
 public:
-    Usuario(int id,
-            const string& nickname,
-            const string& ciudad,
-            const string& pais,
-            const string& fechaRegistro)
-        : Elemento(id),
-        nickname(nickname),
-        ciudad(ciudad),
-        pais(pais),
-        fechaRegistro(fechaRegistro) {}
+    Usuario(int id, const string& nick, const string& ciudad, const string& pais,
+            const string& fecha, const string& tipo)
+        : id(id), nickname(nick), ciudad(ciudad), pais(pais),
+        fechaRegistro(fecha), tipo(tipo), idSeguidoTemporal(-1) {}
 
     virtual ~Usuario() {}
 
-    // Métodos de acceso
-    string getNickname() const { return nickname; }
-    string getCiudad() const { return ciudad; }
-    string getPais() const { return pais; }
-    string getFechaRegistro() const { return fechaRegistro; }
+    int getId() const { return id; }
+    const string& getNickname() const { return nickname; }
+    const string& getCiudad() const { return ciudad; }
+    const string& getPais() const { return pais; }
+    const string& getFechaRegistro() const { return fechaRegistro; }
+    const string& getTipo() const { return tipo; }
 
-    // Métodos abstractos
-    virtual string tipoUsuario() const = 0;
+    // Nuevo setter temporal
+    void setIdSeguidoTemporal(int idSeg) { idSeguidoTemporal = idSeg; }
+    int getIdSeguidoTemporal() const { return idSeguidoTemporal; }
 
-    // Representación común
-    virtual string toString() const override {
-        stringstream ss;
-        ss << "[" << tipoUsuario() << "] ID: " << id
-           << " | Nick: " << nickname
-           << " | Ciudad: " << ciudad
-           << " | País: " << pais
-           << " | Registro: " << fechaRegistro;
-        return ss.str();
-    }
+    virtual void mostrarInfo() const = 0;
 };
-
-#endif

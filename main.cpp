@@ -1,54 +1,114 @@
 #include <iostream>
-#include "lista.h"
-using namespace std;
+#include <string>
+#include "UdeATunes.h"
 
-// Clase simple para probar la lista
-class ElementoPrueba {
-private:
-    int id;
-    string nombre;
 
-public:
-    ElementoPrueba(int i, string n) : id(i), nombre(n) {}
-    int getId() const { return id; }
-    string getNombre() const { return nombre; }
+            using namespace std;
 
-    void mostrar() const {
-        cout << "ID: " << id << " | Nombre: " << nombre << endl;
-    }
-};
+            int main() {
+                cout << "=== INICIANDO UDEATUNES ===" << endl;
 
-int main() {
-    Lista<ElementoPrueba> lista(3);  // Lista inicial con capacidad 3
+                UdeATunes app;
+                app.cargarCanciones("C:/Users/57312/Desktop/jhacasky/Universidad/2025-2/Desafio2_Aguas_Castro/data/canciones.txt");
+                app.cargarAlbumes("C:/Users/57312/Desktop/jhacasky/Universidad/2025-2/Desafio2_Aguas_Castro/data/albumes.txt");
+                app.cargarArtistas("C:/Users/57312/Desktop/jhacasky/Universidad/2025-2/Desafio2_Aguas_Castro/data/artistas.txt");
+                app.cargarUsuarios("C:/Users/57312/Desktop/jhacasky/Universidad/2025-2/Desafio2_Aguas_Castro/data/usuarios.txt");
 
-    // Agregar elementos
-    lista.agregar(new ElementoPrueba(1, "Cancion A"));
-    lista.agregar(new ElementoPrueba(2, "Cancion B"));
-    lista.agregar(new ElementoPrueba(3, "Cancion C"));
+                app.vincular();
 
-    cout << "Lista inicial:" << endl;
-    for (int i = 0; i < lista.tamanio(); ++i)
-        lista.obtener(i)->mostrar();
+                cout << "\n=== DATOS CARGADOS CORRECTAMENTE ===" << endl;
+                app.mostrarResumen();
 
-    cout << "\nBuscando elemento con ID=2..." << endl;
-    int pos = lista.buscarPorId(2);
-    if (pos != -1)
-        lista.obtener(pos)->mostrar();
-    else
-        cout << "No encontrado.\n";
+                cout << "\nPuedes consultar usuarios o artistas del sistema." << endl;
+                cout << "Escribe 'u' para buscar un usuario, 'a' para listar artistas, o 'salir' para terminar." << endl;
 
-    cout << "\nEliminando elemento en índice 1..." << endl;
-    lista.eliminar(1);
+                string opcion;
+                while (true) {
+                    cout << "\n> ";
+                    getline(cin, opcion);
 
-    cout << "Lista después de eliminar:" << endl;
-    for (int i = 0; i < lista.tamanio(); ++i)
-        lista.obtener(i)->mostrar();
+                    if (opcion == "u" || opcion == "U") {
+                        string nick;
+                        cout << "\nIngrese el nickname del usuario: ";
+                        getline(cin, nick);
 
-    cout << "\nLimpiando lista completa..." << endl;
-    lista.limpiar();
-    cout << "Tamaño actual: " << lista.tamanio() << endl;
+                        bool encontrado = false;
+                        for (int i = 0; i < app.getUsuarios().tamanio(); ++i) {
+                            Usuario* u = app.getUsuarios().obtener(i);
+                            if (u->getNickname() == nick) {
+                                encontrado = true;
+                                cout << "\n--- INFORMACION DE USUARIO ---" << endl;
+                                cout << "Nickname: " << u->getNickname() << endl;
+                                cout << "Tipo: " << u->getTipo() << endl;
+                                cout << "Ciudad: " << u->getCiudad() << " (" << u->getPais() << ")" << endl;
+                                cout << "Fecha de registro: " << u->getFechaRegistro() << endl;
 
-    cout << "\nIteraciones realizadas: " << Lista<ElementoPrueba>::getIteraciones() << endl;
+                                UsuarioPremium* p = dynamic_cast<UsuarioPremium*>(u);
+                                if (p) {
+                                    if (p->getSiguiendoA())
+                                        cout << "Siguiendo a: " << p->getSiguiendoA()->getNickname() << endl;
+                                    else
+                                        cout << "No sigue a ningun usuario." << endl;
 
-    return 0;
-}
+                                    if (p->getFavoritas().tamanio() == 0)
+                                        cout << "No tiene canciones favoritas aun." << endl;
+                                    else {
+                                        cout << "\nCanciones favoritas:" << endl;
+                                        for (int j = 0; j < p->getFavoritas().tamanio(); ++j) {
+                                            Cancion* c = p->getFavoritas().obtener(j);
+                                            cout << "  ♪ " << c->getTitulo() << endl;
+                                        }
+                                    }
+                                } else {
+                                    cout << "Este usuario es estandar y no posee lista de favoritos." << endl;
+                                }
+                                break;
+                            }
+                        }
+
+                        if (!encontrado)
+                            cout << "Usuario no encontrado." << endl;
+                    }
+
+                    else if (opcion == "a" || opcion == "A") {
+                        cout << "\n--- ARTISTAS Y SU MUSICA ---" << endl;
+                        for (int i = 0; i < app.getArtistas().tamanio(); ++i) {
+                            Artista* art = app.getArtistas().obtener(i);
+                            cout << "\n " << art->getNombre()
+                                 << " (" << art->getGenero() << ", " << art->getPais() << ")" << endl;
+
+                            if (art->getAlbumes().tamanio() == 0) {
+                                cout << "  (Sin albumes asociados)" << endl;
+                                continue;
+                            }
+
+                            for (int j = 0; j < art->getAlbumes().tamanio(); ++j) {
+                                Album* alb = art->getAlbumes().obtener(j);
+                                cout << "  " << alb->getTitulo() << " (" << alb->getAnio() << ")" << endl;
+
+                                if (alb->getCanciones().tamanio() == 0) {
+                                    cout << " (Sin canciones registradas)" << endl;
+                                    continue;
+                                }
+
+                                for (int k = 0; k < alb->getCanciones().tamanio(); ++k) {
+                                    Cancion* c = alb->getCanciones().obtener(k);
+                                    cout << " " << c->getTitulo()
+                                         << " (" << c->getDuracion() << "s)" << endl;
+                                }
+                            }
+                        }
+                    }
+
+                    else if (opcion == "salir" || opcion == "SALIR") {
+                        cout << "\nCerrando sesión de UdeATunes... ¡Hasta pronto! 🎧" << endl;
+                        break;
+                    }
+
+                    else {
+                        cout << "Comando no reconocido. Usa 'u', 'a' o 'salir'." << endl;
+                    }
+                }
+
+                return 0;
+            }

@@ -1,39 +1,14 @@
-#ifndef USUARIO_ESTANDAR_H
-#define USUARIO_ESTANDAR_H
-
-#include "Usuario.h"
-#include <sstream>
+#pragma once
+#include "usuario.h"
+#include <iostream>
 
 class UsuarioEstandar : public Usuario {
-    const int calidadReproduccion = 128;  // kbps
-    const bool sinPublicidad = false;
-
 public:
-    UsuarioEstandar(int id,
-                    const string& nickname,
-                    const string& ciudad,
-                    const string& pais,
-                    const string& fechaRegistro)
-        : Usuario(id, nickname, ciudad, pais, fechaRegistro) {}
+    UsuarioEstandar(int id, const string& nick, const string& ciudad,
+                    const string& pais, const string& fecha)
+        : Usuario(id, nick, ciudad, pais, fecha, "Estandar") {}
 
-    // Propiedades específicas del estándar
-    int getCalidadReproduccion() const { return calidadReproduccion; }
-    bool tienePublicidad() const { return !sinPublicidad; }
-
-    // Implementación obligatoria
-    string tipoUsuario() const override { return "Estandar"; }
-
-    // Representación textual
-    string toString() const override {
-        stringstream ss;
-        ss << "[" << tipoUsuario() << "] Nick: " << nickname
-           << " | Ciudad: " << ciudad
-           << " | País: " << pais
-           << " | Registro: " << fechaRegistro
-           << " | Calidad: " << calidadReproduccion << " kbps"
-           << " | Con Publicidad: " << boolalpha << tienePublicidad();
-        return ss.str();
+    void mostrarInfo() const override {
+        cout << "Usuario Estandar: " << nickname << " (" << ciudad << ", " << pais << ")\n";
     }
 };
-
-#endif

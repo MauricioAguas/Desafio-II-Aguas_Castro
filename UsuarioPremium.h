@@ -27,13 +27,9 @@ public:
 
     UsuarioPremium* getSiguiendoA() const { return siguiendoA; }
 
-    void mostrarInfo() const override {
-        cout << "Usuario Premium: " << nickname << " (" << ciudad << ", " << pais << ")";
-        if (siguiendoA)
-            cout << " | Siguiendo a: " << siguiendoA->getNickname();
-        cout << endl;
-    }
-
     const Lista<Cancion*>& getFavoritas() const { return favoritas; }
+    string obtenerCalidadAudio() const override {
+        return "320 kbps (Alta Calidad)";
+    }
 };
 

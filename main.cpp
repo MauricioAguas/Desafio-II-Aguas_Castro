@@ -3,112 +3,92 @@
 #include "UdeATunes.h"
 
 
-            using namespace std;
+ using namespace std;
 
-            int main() {
-                cout << "=== INICIANDO UDEATUNES ===" << endl;
+// Función para mostrar el menú de opciones (lo implementaremos después)
+void mostrarMenu(Usuario* u);
 
-                UdeATunes app;
-                app.cargarCanciones("C:/Users/57312/Desktop/jhacasky/Universidad/2025-2/Desafio2_Aguas_Castro/data/canciones.txt");
-                app.cargarAlbumes("C:/Users/57312/Desktop/jhacasky/Universidad/2025-2/Desafio2_Aguas_Castro/data/albumes.txt");
-                app.cargarArtistas("C:/Users/57312/Desktop/jhacasky/Universidad/2025-2/Desafio2_Aguas_Castro/data/artistas.txt");
-                app.cargarUsuarios("C:/Users/57312/Desktop/jhacasky/Universidad/2025-2/Desafio2_Aguas_Castro/data/usuarios.txt");
+int main() {
+    // Inicializar la semilla aleatoria UNA SOLA VEZ
+    srand(time(0));
 
-                app.vincular();
+    cout << "=== UDEATUNES: VIVE LA MÚSICA ===" << endl;
+    UdeATunes app;
 
-                cout << "\n=== DATOS CARGADOS CORRECTAMENTE ===" << endl;
-                app.mostrarResumen();
+    // NOTA: Reemplaza estas rutas con las rutas absolutas correctas de tu sistema
+    const string RUTA_BASE = "C:/Users/57312/Desktop/jhacasky/Universidad/2025-2/Desafio2_Aguas_Castro/Desafio-II-Aguas_Castro/data/";
 
-                cout << "\nPuedes consultar usuarios o artistas del sistema." << endl;
-                cout << "Escribe 'u' para buscar un usuario, 'a' para listar artistas, o 'salir' para terminar." << endl;
+    app.cargarCanciones(RUTA_BASE + "canciones.txt");
+    app.cargarAlbumes(RUTA_BASE + "albumes.txt");
+    app.cargarArtistas(RUTA_BASE + "artistas.txt");
+    app.cargarUsuarios(RUTA_BASE + "usuarios.txt");
 
-                string opcion;
-                while (true) {
-                    cout << "\n> ";
-                    getline(cin, opcion);
+    // ⬅️ CARGA DE ANUNCIOS
+    app.cargarAnuncios(RUTA_BASE + "anuncios.txt");
 
-                    if (opcion == "u" || opcion == "U") {
-                        string nick;
-                        cout << "\nIngrese el nickname del usuario: ";
-                        getline(cin, nick);
+    app.vincular();
 
-                        bool encontrado = false;
-                        for (int i = 0; i < app.getUsuarios().tamanio(); ++i) {
-                            Usuario* u = app.getUsuarios().obtener(i);
-                            if (u->getNickname() == nick) {
-                                encontrado = true;
-                                cout << "\n--- INFORMACION DE USUARIO ---" << endl;
-                                cout << "Nickname: " << u->getNickname() << endl;
-                                cout << "Tipo: " << u->getTipo() << endl;
-                                cout << "Ciudad: " << u->getCiudad() << " (" << u->getPais() << ")" << endl;
-                                cout << "Fecha de registro: " << u->getFechaRegistro() << endl;
+    // --- 1. BUCLE DE PRE-LOGIN ---
+    Usuario* usuarioActual = nullptr;
+    string nickname, comando;
 
-                                UsuarioPremium* p = dynamic_cast<UsuarioPremium*>(u);
-                                if (p) {
-                                    if (p->getSiguiendoA())
-                                        cout << "Siguiendo a: " << p->getSiguiendoA()->getNickname() << endl;
-                                    else
-                                        cout << "No sigue a ningun usuario." << endl;
+    while (usuarioActual == nullptr) {
+        cout << "Ingrese su Nickname para iniciar sesión (o 'salir'): ";
+        cin >> nickname;
 
-                                    if (p->getFavoritas().tamanio() == 0)
-                                        cout << "No tiene canciones favoritas aun." << endl;
-                                    else {
-                                        cout << "\nCanciones favoritas:" << endl;
-                                        for (int j = 0; j < p->getFavoritas().tamanio(); ++j) {
-                                            Cancion* c = p->getFavoritas().obtener(j);
-                                            cout << "  ♪ " << c->getTitulo() << endl;
-                                        }
-                                    }
-                                } else {
-                                    cout << "Este usuario es estandar y no posee lista de favoritos." << endl;
-                                }
-                                break;
-                            }
-                        }
+        if (nickname == "salir" || nickname == "SALIR") {
+            cout << "Cerrando UdeATunes... ¡Hasta pronto! 🎧" << endl;
+            return 0; // Termina la aplicación
+        }
 
-                        if (!encontrado)
-                            cout << "Usuario no encontrado." << endl;
-                    }
+        usuarioActual = app.iniciarSesion(nickname);
 
-                    else if (opcion == "a" || opcion == "A") {
-                        cout << "\n--- ARTISTAS Y SU MUSICA ---" << endl;
-                        for (int i = 0; i < app.getArtistas().tamanio(); ++i) {
-                            Artista* art = app.getArtistas().obtener(i);
-                            cout << "\n " << art->getNombre()
-                                 << " (" << art->getGenero() << ", " << art->getPais() << ")" << endl;
+        if (usuarioActual == nullptr) {
+            cout << "\n❌ ERROR: Nickname no encontrado. Intente de nuevo.\n" << endl;
+        } else {
+            cout << "\n✅ ¡Sesión iniciada con éxito! Bienvenido, "
+                 << usuarioActual->getNickname() << " (" << usuarioActual->getTipo() << ")." << endl;
+        }
+    }
 
-                            if (art->getAlbumes().tamanio() == 0) {
-                                cout << "  (Sin albumes asociados)" << endl;
-                                continue;
-                            }
+    // --- 2. BUCLE DE POST-LOGIN (MENÚ PRINCIPAL) ---
+    while (true) {
+        mostrarMenu(usuarioActual); // Muestra las opciones según el tipo de usuario
+        cout << "\nIngrese su opción: ";
+        cin >> comando;
 
-                            for (int j = 0; j < art->getAlbumes().tamanio(); ++j) {
-                                Album* alb = art->getAlbumes().obtener(j);
-                                cout << "  " << alb->getTitulo() << " (" << alb->getAnio() << ")" << endl;
+        // Ejecutar las funcionalidades
+        if (comando == "1") {
+            app.reproducirRandom(usuarioActual);
+        }
+        else if (comando == "2" && usuarioActual->getTipo() == "Premium") {
+            // Futura función de Lista de Favoritos (Solo Premium)
+            cout << "Funcionalidad 'Mi Lista de Favoritos' en desarrollo." << endl;
+        }
+        else if (comando == "0" || comando == "salir") {
+            cout << "\nCerrando sesión de " << usuarioActual->getNickname() << "... Adiós." << endl;
+            usuarioActual = nullptr; // Opcional: permitiría volver al login si se implementa un bucle exterior
+            break;
+        }
+        else {
+            cout << "\nComando no reconocido o no disponible para su membresía.\n" << endl;
+        }
+    }
 
-                                if (alb->getCanciones().tamanio() == 0) {
-                                    cout << " (Sin canciones registradas)" << endl;
-                                    continue;
-                                }
+    return 0;
+}
 
-                                for (int k = 0; k < alb->getCanciones().tamanio(); ++k) {
-                                    Cancion* c = alb->getCanciones().obtener(k);
-                                    cout << " " << c->getTitulo()
-                                         << " (" << c->getDuracion() << "s)" << endl;
-                                }
-                            }
-                        }
-                    }
 
-                    else if (opcion == "salir" || opcion == "SALIR") {
-                        cout << "\nCerrando sesión de UdeATunes... ¡Hasta pronto! 🎧" << endl;
-                        break;
-                    }
+// Implementación de la función mostrarMenu
+void mostrarMenu(Usuario* u) {
+    cout << "\n======== MENÚ PRINCIPAL ========" << endl;
+    cout << "1. Reproducción Aleatoria Global (K=5)" << endl;
 
-                    else {
-                        cout << "Comando no reconocido. Usa 'u', 'a' o 'salir'." << endl;
-                    }
-                }
+    if (u->getTipo() == "Premium") {
+        cout << "2. Mi Lista de Favoritos (Premium)" << endl;
+        // Podríamos agregar más opciones aquí
+    }
 
-                return 0;
-            }
+    cout << "0. Cerrar Sesión / Salir" << endl;
+    cout << "================================" << endl;
+}

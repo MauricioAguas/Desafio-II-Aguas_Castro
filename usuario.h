@@ -21,6 +21,7 @@ public:
         fechaRegistro(fecha), tipo(tipo), idSeguidoTemporal(-1) {}
 
     virtual ~Usuario() {}
+    virtual string obtenerCalidadAudio() const = 0;
 
     int getId() const { return id; }
     const string& getNickname() const { return nickname; }
@@ -32,6 +33,4 @@ public:
     // Nuevo setter temporal
     void setIdSeguidoTemporal(int idSeg) { idSeguidoTemporal = idSeg; }
     int getIdSeguidoTemporal() const { return idSeguidoTemporal; }
-
-    virtual void mostrarInfo() const = 0;
 };

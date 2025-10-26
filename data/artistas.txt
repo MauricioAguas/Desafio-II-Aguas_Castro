@@ -2,3 +2,4 @@
 2;Muse;UK;Rock;2
 3;The Beatles;UK;Rock;3
 4;Ed Sheeran;UK;Pop;4
+5;BadBunny;RD;pop;5

@@ -1,0 +1,15 @@
+hasta ahora mi estructura es la siguiente existe una carpeta data que cuenta con
+usuarios.txt,artistas.txt,albumes.txt,canciones.txt y anuncios.txt que falta por implementar
+tienes las siguientes clases 
+cancion.h
+artista.h
+album.h
+lista.h
+elemento.h
+ususario.h
+usuarioEstandar.h
+usuarioPremium.h
+udeatunes.h
+udeatunes.cpp
+y tienen un main.cpp 
+todos los archivos te los acabo de pasar ahora quiero continuar con el desarrollo.

@@ -3,11 +3,16 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-
+#include <chrono>
+#include <thread>
+#include <cstdlib> // Para rand() y srand()
+#include <ctime>   // Para time()
+#include <algorithm>
 #include "lista.h"
 #include "cancion.h"
 #include "album.h"
 #include "artista.h"
+#include "anuncio.h"
 #include "UsuarioEstandar.h"
 #include "UsuarioPremium.h"
 
@@ -19,7 +24,8 @@ private:
     Lista<Album*> albumes;
     Lista<Artista*> artistas;
     Lista<Usuario*> usuarios;
-
+    Lista<Anuncio*> anuncios;
+    int ultimoAnuncioId;
 public:
     UdeATunes();
     ~UdeATunes();
@@ -32,10 +38,17 @@ public:
     void cargarAlbumes(const string& ruta);
     void cargarArtistas(const string& ruta);
     void cargarUsuarios(const string& ruta);
+    void cargarAnuncios(const string& ruta);
 
     // Método para vincular relaciones
     void vincular();
 
     // Métodos de depuración
     void mostrarResumen() const;
+    //metodo para optener anuncios
+    Anuncio* obtenerAnuncioAleatorio();
+    Usuario* iniciarSesion(const string& nickname);
+    void reproducirRandom(Usuario* usuario);
+
+
 };

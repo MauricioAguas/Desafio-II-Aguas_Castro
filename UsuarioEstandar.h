@@ -8,7 +8,7 @@ public:
                     const string& pais, const string& fecha)
         : Usuario(id, nick, ciudad, pais, fecha, "Estandar") {}
 
-    void mostrarInfo() const override {
-        cout << "Usuario Estandar: " << nickname << " (" << ciudad << ", " << pais << ")\n";
+    string obtenerCalidadAudio() const override {
+        return "128 kbps (Calidad Estándar)";
     }
 };

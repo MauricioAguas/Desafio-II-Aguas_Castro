@@ -8,3 +8,7 @@
 8;Shape of You;234;4;Musica/ShapeOfYou
 9;Perfect;263;4;Musica/Perfect
 10;Photograph;258;4;Musica/Photograph
+11;andre;320;5;Musica/andrea
+12;tiro la piedra;180;5;musica/tiro la piedra
+13;tiro;180;5;musica/tiro
+14;tiro la;180;5;musica/tiro la

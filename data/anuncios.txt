@@ -1,0 +1,9 @@
+1;¡Compra tu UdeATunes Pro! Descuento por tiempo limitado.;AAA
+2;¡Visita nuestra tienda de merchandising UdeA! Nuevos diseños.;C
+3;Patrocinador: Bebida Energética 'Turbo'. Sube tu nivel.;B
+4;Nuevo Álbum de Estrellas, ¡Ya disponible en UdeATunes!;AAA
+5;¿Ya viste el nuevo video musical? ¡Link en la descripción!;C
+6;UdeATunes: Tu música, donde quieras. Sin límites.;C
+7;Patrocinador: App de idiomas 'Lingua'. Aprende en 5 minutos.;B
+8;Financia tu carrera. Créditos universitarios flexibles.;AAA
+9;Sigue a tus artistas favoritos en redes sociales.;C

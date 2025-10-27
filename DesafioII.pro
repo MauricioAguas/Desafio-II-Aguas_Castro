@@ -9,6 +9,7 @@ SOURCES += \
 
 HEADERS += \
     InterfazVisual.h \
+    MenuInteractivo.h \
     TiempoPausa.h \
     UsuarioEstandar.h \
     UsuarioPremium.h \

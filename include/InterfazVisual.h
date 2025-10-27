@@ -37,6 +37,31 @@ public:
         cout << "| Categoria: " << categoria << "                              |" << endl;
         cout << "+-------------------------------------------------+" << endl;
     }
+    /**
+ * @brief Muestra interfaz de reproduccion con datos reales del sistema
+ */
+    static void mostrarReproduccionReal(const string& titulo, const string& artista,
+                                        const string& album, const string& rutaArchivo,
+                                        int duracion, const string& calidad) {
+        cout << "\n+-------------------------------------------------+" << endl;
+        cout << "|                                                 |" << endl;
+        cout << "| Cantante: " << ajustarTexto(artista, 32) << "|" << endl;
+        cout << "| Album: " << ajustarTexto(album, 35) << "|" << endl;
+        cout << "| Ruta portada: /img/" << ajustarTexto(album, 20) << ".jpg    |" << endl;
+        cout << "|                                                 |" << endl;
+        cout << "| Titulo de la cancion reproducida:              |" << endl;
+        cout << "| " << ajustarTexto(titulo, 45) << " |" << endl;
+        cout << "| Ruta audio: " << ajustarTexto(rutaArchivo + ".ogg", 28) << "    |" << endl;
+        cout << "| Duracion: " << duracion << " segundos" << ajustarTexto("", 25 - to_string(duracion).length()) << "|" << endl;
+        cout << "| Calidad: " << ajustarTexto(calidad, 32) << "|" << endl;
+        cout << "|                                                 |" << endl;
+        cout << "+-------------------------------------------------+" << endl;
+        cout << "+-------------------------------------------------+" << endl;
+        cout << "| Opciones de reproduccion:                      |" << endl;
+        cout << "| 1.- Reproducir  2.- Detener  3.- Siguiente     |" << endl;
+        cout << "| *Todas las opciones que apliquen               |" << endl;
+        cout << "+-------------------------------------------------+" << endl;
+    }
 
 private:
     static string ajustarTexto(const string& texto, int longitud) {

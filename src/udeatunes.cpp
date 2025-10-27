@@ -321,53 +321,124 @@ void UdeATunes::vincular() {
 // K=5 canciones. Publicidad cada 2 para Estandar.
 // =======================================================
 void UdeATunes::reproducirRandom(Usuario* usuario) {
-    cout << "\n===== INICIANDO REPRODUCCION =====" << endl;
-
-    // ===== LOGICA DE PUBLICIDAD PARA USUARIOS ESTANDAR =====
-    if (usuario->getTipo() == "Estandar") {
-        UsuarioEstandar* usuarioEst = static_cast<UsuarioEstandar*>(usuario);
-
-        // Verificar si necesita ver publicidad (cada 2 canciones)
-        if (usuarioEst->necesitaPublicidad()) {
-            cout << "\n======== TIEMPO DE PUBLICIDAD ========" << endl;
-
-            // Simular anuncio (sin depender de obtenerAnuncioAleatorio)
-            string mensajeAnuncio = "Hazte Premium por solo $19,900 COP";
-            string categoriaAnuncio = "AAA";
-
-            // Mostrar publicidad con interfaz visual
-            InterfazVisual::mostrarPublicidad(mensajeAnuncio, categoriaAnuncio);
-
-            // Pausa obligatoria de 3 segundos con chrono
-            TiempoPausa::pausar3Segundos();
-        }
-
-        // Incrementar contador SIEMPRE
-        usuarioEst->incrementarContador();
+    if (canciones.tamanio() == 0) {
+        cout << "No hay canciones cargadas para reproducir." << endl;
+        return;
     }
 
-    // ===== REPRODUCCION SIMULADA =====
-    string nombreCancion = "Self Care";
-    string nombreArtista = "Mac Miller";
-    string nombreAlbum = "Swimming";
+    string calidadAudio = (usuario->getTipo() == "Premium")
+                              ? "320 kbps (Alta Calidad)" : "128 kbps (Calidad Estandar)";
 
-    // Mostrar interfaz visual de reproduccion (TU CODIGO FUNCIONAL)
-    InterfazVisual::mostrarReproduccion(nombreCancion, nombreArtista, nombreAlbum);
+    cout << "\n=== INICIANDO REPRODUCCION ALEATORIA GLOBAL (K=5) ===" << endl;
+    cout << "Usuario: " << usuario->getNickname() << " (" << usuario->getTipo() << ")" << endl;
+    cout << "Calidad: " << calidadAudio << endl;
 
-    // Mostrar info adicional
-    cout << "\nReproduciendo: " << nombreCancion << endl;
-    cout << "Artista: " << nombreArtista << endl;
-    cout << "Album: " << nombreAlbum << endl;
-    cout << "Calidad: " << usuario->obtenerCalidadAudio() << endl;
-
-    // Mostrar estadisticas para usuario estandar
+    // Contador para publicidad de usuarios estandar
     if (usuario->getTipo() == "Estandar") {
         UsuarioEstandar* usuarioEst = static_cast<UsuarioEstandar*>(usuario);
-        cout << "Canciones reproducidas: " << usuarioEst->getContadorCanciones() << endl;
+        cout << "Canciones reproducidas previamente: " << usuarioEst->getContadorCanciones() << endl;
+    }
+    cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    for (int i = 1; i <= 5; ++i) {
+        // ========== LOGICA DE PUBLICIDAD PARA USUARIOS ESTANDAR ==========
+        if (usuario->getTipo() == "Estandar") {
+            UsuarioEstandar* usuarioEst = static_cast<UsuarioEstandar*>(usuario);
 
-        if (usuarioEst->getContadorCanciones() % 2 == 0) {
-            cout << "Siguiente cancion tendra publicidad" << endl;
+            // Verificar si necesita publicidad (cada 2 canciones)
+            if (usuarioEst->necesitaPublicidad()) {
+                cout << "\n======== TIEMPO DE PUBLICIDAD ========" << endl;
+
+                // Obtener anuncio real del sistema de Jharlin
+                Anuncio* ad = obtenerAnuncioAleatorio();
+                if (ad) {
+                    // Mostrar publicidad con tu InterfazVisual
+                    InterfazVisual::mostrarPublicidad(ad->getMensaje(), ad->getCategoria());
+
+                    // Pausa obligatoria de 3 segundos con tu TiempoPausa
+                    TiempoPausa::pausar3Segundos();
+                }
+                cout << "========================================" << endl;
+            }
+
+            // Incrementar contador siempre
+            usuarioEst->incrementarContador();
         }
+
+        // ========== SELECCION ALEATORIA DE CANCION REAL ==========
+        int max_canciones = canciones.tamanio();
+        int indice_aleatorio = rand() % max_canciones;
+        Cancion* cancionActual = canciones.obtener(indice_aleatorio);
+
+        // ========== EXTRAER ALBUM Y ARTISTA ASOCIADO ==========
+        string nombreAlbum = "Desconocido";
+        string nombreArtista = "Desconocido";
+        string rutaPortada = "/img/default.jpg";
+
+        // Buscar album de la cancion
+        for (int a = 0; a < albumes.tamanio(); ++a) {
+            Album* album = albumes.obtener(a);
+            for (int c = 0; c < album->getCanciones().tamanio(); ++c) {
+                if (album->getCanciones().obtener(c) == cancionActual) {
+                    nombreAlbum = album->getTitulo();
+                    rutaPortada = "/img/" + nombreAlbum + ".jpg";
+
+                    // Buscar artista del album
+                    for (int art = 0; art < artistas.tamanio(); ++art) {
+                        Artista* artista = artistas.obtener(art);
+                        for (int b = 0; b < artista->getAlbumes().tamanio(); ++b) {
+                            if (artista->getAlbumes().obtener(b) == album) {
+                                nombreArtista = artista->getNombre();
+                                break;
+                            }
+                        }
+                        if (nombreArtista != "Desconocido") break;
+                    }
+                    break;
+                }
+            }
+            if (nombreAlbum != "Desconocido") break;
+        }
+
+        // ========== MOSTRAR INTERFAZ VISUAL DE REPRODUCCION ==========
+        cout << "\n[" << i << "/5] ========== REPRODUCIENDO ==========" << endl;
+
+        // Usar tu InterfazVisual con datos reales
+        InterfazVisual::mostrarReproduccionReal(
+            cancionActual->getTitulo(),
+            nombreArtista,
+            nombreAlbum,
+            cancionActual->getRutaArchivo(),
+            cancionActual->getDuracion(),
+            calidadAudio
+            );
+
+        // Informacion adicional
+        cout << "\nInformacion adicional:" << endl;
+        cout << "- Usuario: " << usuario->getNickname() << " (" << usuario->getTipo() << ")" << endl;
+        cout << "- Archivo: " << cancionActual->getRutaArchivo() << ".ogg" << endl;
+
+        if (usuario->getTipo() == "Estandar") {
+            UsuarioEstandar* usuarioEst = static_cast<UsuarioEstandar*>(usuario);
+            cout << "- Total reproducidas: " << usuarioEst->getContadorCanciones() << endl;
+
+            if (usuarioEst->getContadorCanciones() % 2 == 0) {
+                cout << "- Siguiente cancion incluira publicidad" << endl;
+            }
+        }
+
+        cout << "\n=============================================" << endl;
+
+        // Pequeña pausa entre canciones
+        if (i < 5) {
+            cout << "Presione Enter para siguiente cancion...";
+            cin.get();
+        }
+    }
+
+    cout << "\n=== REPRODUCCION COMPLETADA ===" << endl;
+    if (usuario->getTipo() == "Estandar") {
+        UsuarioEstandar* usuarioEst = static_cast<UsuarioEstandar*>(usuario);
+        cout << "Total de canciones reproducidas en esta sesion: " << usuarioEst->getContadorCanciones() << endl;
     }
 }
 

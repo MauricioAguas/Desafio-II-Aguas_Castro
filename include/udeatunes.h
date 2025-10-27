@@ -17,7 +17,7 @@
 #include "UsuarioPremium.h"
 #include "TiempoPausa.h"
 #include "InterfazVisual.h"
-
+#include "MenuInteractivo.h"
 using namespace std;
 
 class UdeATunes {

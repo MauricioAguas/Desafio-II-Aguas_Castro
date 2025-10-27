@@ -1,12 +1,9 @@
 #include <iostream>
 #include <string>
 #include "UdeATunes.h"
+#include "MenuInteractivo.h"
 
-
- using namespace std;
-
-// Función para mostrar el menú de opciones (lo implementaremos después)
-void mostrarMenu(Usuario* u);
+using namespace std;
 
 int main() {
     // Inicializar la semilla aleatoria UNA SOLA VEZ
@@ -23,72 +20,67 @@ int main() {
     app.cargarArtistas(RUTA_BASE + "artistas.txt");
     app.cargarUsuarios(RUTA_BASE + "usuarios.txt");
 
-    // ⬅️ CARGA DE ANUNCIOS
+    // CARGA DE ANUNCIOS
     app.cargarAnuncios(RUTA_BASE + "anuncios.txt");
 
     app.vincular();
 
     // --- 1. BUCLE DE PRE-LOGIN ---
     Usuario* usuarioActual = nullptr;
-    string nickname, comando;
+    string nickname;
 
     while (usuarioActual == nullptr) {
-        cout << "Ingrese su Nickname para iniciar seson (o 'salir'): ";
+        cout << "Ingrese su Nickname para iniciar sesion (o 'salir'): ";
         cin >> nickname;
 
         if (nickname == "salir" || nickname == "SALIR") {
-            cout << "Cerrando UdeATunes... ¡Hasta pronto! 🎧" << endl;
-            return 0; // Termina la aplicación
+            cout << "Cerrando UdeATunes... Hasta pronto!" << endl;
+            return 0; // Termina la aplicacion
         }
 
         usuarioActual = app.iniciarSesion(nickname);
 
         if (usuarioActual == nullptr) {
-            cout << "\n ERROR: Nickname no encontrado. Intente de nuevo.\n" << endl;
+            cout << "\nERROR: Nickname no encontrado. Intente de nuevo.\n" << endl;
         } else {
-            cout << "\n Sesion iniciada con exito! Bienvenido, "
+            cout << "\nSesion iniciada con exito! Bienvenido, "
                  << usuarioActual->getNickname() << " (" << usuarioActual->getTipo() << ")." << endl;
         }
     }
 
-    // --- 2. BUCLE DE POST-LOGIN (MENÚ PRINCIPAL) ---
+    // --- 2. BUCLE DE POST-LOGIN (MENU INTERACTIVO) ---
+    int opcion = -1;
     while (true) {
-        mostrarMenu(usuarioActual); // Muestra las opciones según el tipo de usuario
-        cout << "\nIngrese su opcion: ";
-        cin >> comando;
+        // Mostrar menu segun tipo de usuario
+        MenuInteractivo::mostrarMenuPrincipal(usuarioActual);
 
-        // Ejecutar las funcionalidades
-        if (comando == "1") {
+        cout << "\nIngrese su opcion: ";
+        if (!(cin >> opcion)) {
+            // Limpiar buffer si entrada invalida
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Entrada invalida. Intente de nuevo." << endl;
+            continue;
+        }
+
+        if (opcion == 1) {
+            // Tu funcionalidad ya implementada (reproduccion aleatoria)
             app.reproducirRandom(usuarioActual);
+
+            cout << "\nPresione Enter para continuar...";
+            cin.ignore();
+            cin.get();
+            continue;
         }
-        else if (comando == "2" && usuarioActual->getTipo() == "Premium") {
-            // Futura función de Lista de Favoritos (Solo Premium)
-            cout << "Funcionalidad 'Mi Lista de Favoritos' en desarrollo." << endl;
-        }
-        else if (comando == "0" || comando == "salir") {
+
+        // Otras opciones: las maneja MenuInteractivo
+        bool salir = MenuInteractivo::procesarOpcion(opcion, usuarioActual);
+        if (salir) {
             cout << "\nCerrando sesion de " << usuarioActual->getNickname() << "... Adios." << endl;
-            usuarioActual = nullptr; // Opcional: permitiría volver al login si se implementa un bucle exterior
+            usuarioActual = nullptr;
             break;
-        }
-        else {
-            cout << "\nComando no reconocido o no disponible para su membresia.\n" << endl;
         }
     }
 
     return 0;
-}
-
-
-// Implementación de la función mostrarMenu
-void mostrarMenu(Usuario* u) {
-    cout << "\n======== MENU PRINCIPAL ========" << endl;
-    cout << "1. Reproduccion Aleatoria Global (K=5)" << endl;
-
-    if (u->getTipo() == "Premium") {
-        cout << "2. Mi Lista de Favoritos (Premium)" << endl;
-        // Podríamos agregar más opciones aquí
-    }
-
-    cout << "0. Cerrar Sesion / Salir" << endl;
-    cout << "================================" << endl;
 }

@@ -321,57 +321,54 @@ void UdeATunes::vincular() {
 // K=5 canciones. Publicidad cada 2 para Estandar.
 // =======================================================
 void UdeATunes::reproducirRandom(Usuario* usuario) {
-    if (canciones.tamanio() == 0) {
-        cout << "No hay canciones cargadas para reproducir." << endl;
-        return;
-    }
+    cout << "\n===== INICIANDO REPRODUCCION =====" << endl;
 
-    // 1. Inicializar la medición de recursos
-    int iteracionesIniciales = Lista<Cancion*>::getIteraciones();
+    // ===== LOGICA DE PUBLICIDAD PARA USUARIOS ESTANDAR =====
+    if (usuario->getTipo() == "Estandar") {
+        UsuarioEstandar* usuarioEst = static_cast<UsuarioEstandar*>(usuario);
 
-    cout << "\n=== INICIANDO REPRODUCCIÓN ALEATORIA GLOBAL (K=5) ===" << endl;
-    cout << "Usuario: " << usuario->getNickname() << " (" << usuario->getTipo() << ")" << endl;
+        // Verificar si necesita ver publicidad (cada 2 canciones)
+        if (usuarioEst->necesitaPublicidad()) {
+            cout << "\n======== TIEMPO DE PUBLICIDAD ========" << endl;
 
-    string calidadAudio = (usuario->getTipo() == "Premium") ? "320 kbps (Alta Calidad)" : "128 kbps (Calidad Estándar)";
+            // Simular anuncio (sin depender de obtenerAnuncioAleatorio)
+            string mensajeAnuncio = "Hazte Premium por solo $19,900 COP";
+            string categoriaAnuncio = "AAA";
 
-    // 2. Bucle de reproducción de K=5 canciones
-    for (int i = 1; i <= 5; ++i) {
-        // --- 2.1. Lógica de Publicidad (Solo para Estandar) ---
-        // Se ejecuta cada 2 canciones (i=2 y i=4)
-        if (usuario->getTipo() == "Estandar" && i > 1 && (i - 1) % 2 == 0) {
-            cout << "\n--- PAUSA COMERCIAL ---" << endl;
-            Anuncio* ad = obtenerAnuncioAleatorio(); // Usa la función ponderada implementada
-            if (ad) {
-                ad->mostrar();
-            }
-            cout << "-----------------------" << endl;
+            // Mostrar publicidad con interfaz visual
+            InterfazVisual::mostrarPublicidad(mensajeAnuncio, categoriaAnuncio);
+
+            // Pausa obligatoria de 3 segundos con chrono
+            TiempoPausa::pausar3Segundos();
         }
 
-        // --- 2.2. Selección Aleatoria de Canción ---
-        int max_canciones = canciones.tamanio();
-        // Fórmula: rand() % N para obtener un número entre 0 y N-1
-        int indice_aleatorio = rand() % max_canciones;
-        Cancion* cancionActual = canciones.obtener(indice_aleatorio);
-
-        // El método obtener() incrementa las iteraciones de Lista
-
-        // --- 2.3. Simulación de Reproducción ---
-        cout << "\n[" << i << "/5] Reproduciendo... " << cancionActual->getTitulo() << endl;
-        cout << "  - Ruta del archivo: " << cancionActual->getRutaArchivo() << ".ogg" << endl;
-        cout << "  - Calidad de Audio: " << calidadAudio << endl;
-        cout << "  (Simulando 3 segundos de reproducción...)\n";
-
-        // Simulación de pausa (simulando la librería chronos que no podemos usar aquí)
-        // Por lo general, se usaría: this_thread::sleep_for(chrono::seconds(3));
+        // Incrementar contador SIEMPRE
+        usuarioEst->incrementarContador();
     }
 
-    // 3. Medición del consumo de recursos
-    int iteracionesTotales = Lista<Cancion*>::getIteraciones();
-    cout << "\n=== MEDICIÓN DE RECURSOS (Reproducción Aleatoria) ===" << endl;
-    cout << "Cantidad de iteraciones requeridas: " << (iteracionesTotales - iteracionesIniciales) << endl;
-    // La medición de la memoria consumida requiere librerías específicas (como malloc_trim, etc.)
-    // que no están permitidas o no son estándar, por lo que nos enfocaremos en las iteraciones.
-    cout << "Total de memoria consumida: (Requiere herramientas de sistema, solo mostrando iteraciones)" << endl;
+    // ===== REPRODUCCION SIMULADA =====
+    string nombreCancion = "Self Care";
+    string nombreArtista = "Mac Miller";
+    string nombreAlbum = "Swimming";
+
+    // Mostrar interfaz visual de reproduccion (TU CODIGO FUNCIONAL)
+    InterfazVisual::mostrarReproduccion(nombreCancion, nombreArtista, nombreAlbum);
+
+    // Mostrar info adicional
+    cout << "\nReproduciendo: " << nombreCancion << endl;
+    cout << "Artista: " << nombreArtista << endl;
+    cout << "Album: " << nombreAlbum << endl;
+    cout << "Calidad: " << usuario->obtenerCalidadAudio() << endl;
+
+    // Mostrar estadisticas para usuario estandar
+    if (usuario->getTipo() == "Estandar") {
+        UsuarioEstandar* usuarioEst = static_cast<UsuarioEstandar*>(usuario);
+        cout << "Canciones reproducidas: " << usuarioEst->getContadorCanciones() << endl;
+
+        if (usuarioEst->getContadorCanciones() % 2 == 0) {
+            cout << "Siguiente cancion tendra publicidad" << endl;
+        }
+    }
 }
 
 // =======================================================

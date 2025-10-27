@@ -15,6 +15,8 @@
 #include "anuncio.h"
 #include "UsuarioEstandar.h"
 #include "UsuarioPremium.h"
+#include "TiempoPausa.h"
+#include "InterfazVisual.h"
 
 using namespace std;
 

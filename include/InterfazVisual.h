@@ -15,10 +15,12 @@ public:
                                     const string& tipoUsuario,
                                     bool reproduccionActiva,
                                     bool tieneAnterior,
-                                    bool repetir) {
+                                    bool repetir,
+                                    int idCancion) {
         const size_t ancho = 49;
 
         cout << "\n+-------------------------------------------------+" << endl;
+        cout << "| ID Cancion: " << idCancion << ajustarTexto("", 34 - to_string(idCancion).length()) << "|\n";
         cout << "| Cantante: " << ajustarTexto(artista, ancho - 12) << "|" << endl;
         cout << "| Album: " << ajustarTexto(album, ancho - 9) << "|" << endl;
         cout << "| Ruta portada: " << ajustarTexto("/img/" + album + ".jpg", ancho - 16) << "|" << endl;

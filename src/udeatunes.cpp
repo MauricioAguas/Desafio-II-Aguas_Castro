@@ -67,7 +67,7 @@ void UdeATunes::cargarCanciones(const string& ruta) {
     }
 
     file.close();
-    cout << "[Carga] " << canciones.tamanio() << " canciones cargadas. Ultimo ID temporal: " << ultimoIdTemporalCancion << endl;
+    cout << " " << canciones.tamanio() << " canciones cargadas. Ultimo ID temporal: " << ultimoIdTemporalCancion << endl;
 }
 // =======================================================
 // CARGA DE ALBUMES
@@ -339,28 +339,15 @@ Usuario* UdeATunes::iniciarSesion(const string& nickname) {
     // 4. Si el bucle termina sin encontrar coincidencias
     return nullptr;
 }
-Cancion* UdeATunes::buscarCancionPorId(int id) {
-    for (int i = 0; i < canciones.tamanio(); ++i) {
-        Cancion* c = canciones.obtener(i);
-        // Compara con el ID final (que fue asignado en vincular())
-        if (c->getId() == id) {
-            return c;
-        }
-    }
-    return nullptr; // No encontrada
-}
+
 // =======================================================
-// VINCULAR ENTIDADES POR ID
-// Canciones → Albumes → Artistas → Usuarios
-// =======================================================
-// =======================================================
-// 🔹 VINCULACIÓN DE RELACIONES Y GENERACIÓN DE ID FINAL
+// VINCULACION DE RELACIONES Y GENERACION DE ID FINAL
 // =======================================================
 void UdeATunes::vincular() {
-    cout << "\n--- Iniciando Vinculación de Relaciones ---" << endl;
+    cout << "\n--- Iniciando Vinculacion de Relaciones ---" << endl;
 
-    // --- FASE 1: VINCULACIÓN ARTISTA <-> ALBUM ---
-    cout << "Vinculando Álbumes a Artistas..." << endl;
+    // --- FASE 1: VINCULACION ARTISTA <-> ALBUM ---
+    cout << "Vinculando Albumes a Artistas..." << endl;
     for (int i = 0; i < artistas.tamanio(); ++i) {
         Artista* artista = artistas.obtener(i);
         const Lista<int*>& albumesIDs = artista->getAlbumesIDs();
@@ -376,8 +363,8 @@ void UdeATunes::vincular() {
         }
     }
 
-    // --- FASE 2: VINCULACIÓN ALBUM <-> CANCION ---
-    cout << "Vinculando Canciones a Álbumes..." << endl;
+    // --- FASE 2: VINCULACION ALBUM <-> CANCION ---
+    cout << "Vinculando Canciones a Albumes..." << endl;
     for (int i = 0; i < albumes.tamanio(); ++i) {
         Album* album = albumes.obtener(i);
         const Lista<int*>& cancionesIDs = album->getCancionesIDs();
@@ -385,8 +372,8 @@ void UdeATunes::vincular() {
             int idCancionBuscado = *cancionesIDs.obtener(j);
             for (int k = 0; k < canciones.tamanio(); ++k) {
                 Cancion* cancion = canciones.obtener(k);
-                // NOTA: La Cancion almacena el idAlbum. Usamos ese para la búsqueda.
-                // En este caso, el ID buscado es el ID TEMPORAL de la canción.
+                // NOTA: La Cancion almacena el idAlbum. Usamos ese para la busqueda.
+                // En este caso, el ID buscado es el ID TEMPORAL de la cancion.
                 if (cancion->getIdTemporal() == idCancionBuscado && cancion->getIdAlbum() == album->getId()) {
                     album->agregarCancion(cancion);
                     break;
@@ -396,8 +383,8 @@ void UdeATunes::vincular() {
     }
 
 
-    // --- FASE 3: GENERACIÓN del ID FINAL de 9 DÍGITOS para CADA CANCIÓN ---
-    cout << "Generando ID final de 9 dígitos para cada Canción..." << endl;
+    // --- FASE 3: GENERACION del ID FINAL de 9 DIGITOS para CADA CANCION ---
+    cout << "Generando ID final de 9 digitos para cada Cancion..." << endl;
     for (int i = 0; i < canciones.tamanio(); ++i) {
         Cancion* cancion = canciones.obtener(i);
         int idCancionTemp = cancion->getIdTemporal();
@@ -420,34 +407,34 @@ void UdeATunes::vincular() {
             nombreAlbum = albumEncontrado->getTitulo();
 
             // 2. Calcular el ID final (ID Artista * 1000 + ID Album * 100 + ID Cancion Temporal)
-            // Esto garantiza un ID de 9 dígitos asumiendo IDs de 3 dígitos (999, 99, 99)
-            // Si Artista tiene 1 o 2 dígitos, y Album/Canción 1 o 2, el ID será de 6 a 9 dígitos.
-            // Para asegurar los 9 dígitos, se usaría multiplicación por potencias de 1000.
-            // PERO: La fórmula proporcionada es: idArtista*1000 + idAlbum*100 + idCancionTemporal
-            // Si la fórmula debe generar 9 dígitos (ej: 001001001), la fórmula real sería:
+            // Esto garantiza un ID de 9 digitos asumiendo IDs de 3 digitos (999, 99, 99)
+            // Si Artista tiene 1 o 2 digitos, y Album/Cancion 1 o 2, el ID sera de 6 a 9 digitos.
+            // Para asegurar los 9 digitos, se usaria multiplicacion por potencias de 1000.
+            // PERO: La formula proporcionada es: idArtista*1000 + idAlbum*100 + idCancionTemporal
+            // Si la formula debe generar 9 digitos (ej: 001001001), la formula real seria:
             // ID = idArtista*1000000 + idAlbum*1000 + idCancionTemporal
             // Ya que el enunciado dice que el ID final *es* esa suma, lo implementamos tal cual.
             long long int idFinal = idArtista * 10000 + idAlbum * 100 + idCancionTemp;
 
-            // 3. Asignar el ID final a la canción
+            // 3. Asignar el ID final a la cancion
             cancion->setID(idFinal);
 
-            // Ejemplo de depuración:
+            // Ejemplo de depuracion:
             // cout << "-> Cancion: " << cancion->getTitulo()
             //      << ", TempID: " << idCancionTemp
             //      << ", AlbumID: " << idAlbum
             //      << ", ArtistaID: " << idArtista
             //      << ", ID FINAL: " << idFinal << endl;
         } else {
-            cerr << "⚠️ Error de vinculación: No se encontró el álbum ID " << idAlbum << " para la canción " << cancion->getTitulo() << endl;
+            cerr << " Error de vinculacion: No se encontro el album ID " << idAlbum << " para la cancion " << cancion->getTitulo() << endl;
         }
     }
 
 
-    // --- FASE 4: VINCULACIÓN USUARIOS (FAVORITOS y SEGUIDOS) ---
+    // --- FASE 4: VINCULACION USUARIOS (FAVORITOS y SEGUIDOS) ---
     cout << "Vinculando Usuarios (Favoritos y Seguidos)..." << endl;
 
-    // Vinculación de Seguidos (solo para Premium)
+    // Vinculacion de Seguidos (solo para Premium)
     for (int i = 0; i < usuarios.tamanio(); ++i) {
         Usuario* user = usuarios.obtener(i);
         if (user->getTipo() == "Premium") {
@@ -466,7 +453,7 @@ void UdeATunes::vincular() {
         }
     }
 
-    // Vinculación de Favoritos (solo para Premium)
+    // Vinculacion de Favoritos (solo para Premium)
     for (int i = 0; i < usuarios.tamanio(); ++i) {
         Usuario* user = usuarios.obtener(i);
         if (user->getTipo() == "Premium") {
@@ -480,16 +467,32 @@ void UdeATunes::vincular() {
                 if (cancionFavorita) {
                     premiumUser->agregarCancionFavorita(cancionFavorita);
                 } else {
-                    cerr << "⚠️ Error: Canción con ID final " << idFinalBuscado << " no encontrada para favoritos." << endl;
+                    cerr << " Error: Cancion con ID final " << idFinalBuscado << " no encontrada para favoritos." << endl;
                 }
             }
-            // Importante: liberar los IDs temporales si ya no se usarán
+            // Importante: liberar los IDs temporales si ya no se usaran
             // En este caso, la clase UsuarioPremium es responsable de liberar sus int*
         }
     }
 
-    cout << "--- Vinculación Completa ---" << endl;
+    cout << "--- Vinculacion Completa ---" << endl;
 }
+// =======================================================
+// Busqueda de Cancion por ID (final de 9 digitos)
+//    Esta funcion es esencial para vincular los favoritos de los usuarios
+//    despues de generar los IDs finales.
+// =======================================================
+Cancion* UdeATunes::buscarCancionPorId(int id) {
+    for (int i = 0; i < canciones.tamanio(); ++i) {
+        Cancion* c = canciones.obtener(i);
+        // Compara con el ID final (que fue asignado en vincular())
+        if (c->getId() == id) {
+            return c;
+        }
+    }
+    return nullptr; // No encontrada
+}
+
 // =======================================================
 // GESTION DE LISTA DE FAVORITOS (Solo Premium)
 // =======================================================
@@ -497,7 +500,7 @@ void UdeATunes::gestionarFavoritos(Usuario* usuario) {
     // 1. DYNAMIC CAST OBLIGATORIO
     UsuarioPremium* premiumUser = dynamic_cast<UsuarioPremium*>(usuario);
     if (premiumUser == nullptr) {
-        cout << "Error interno: Esta funcion solo debe ser llamada por usuarios Premium." << endl;
+        cout << " Error interno: Esta funcion solo debe ser llamada por usuarios Premium." << endl;
         return;
     }
 
@@ -523,9 +526,9 @@ void UdeATunes::gestionarFavoritos(Usuario* usuario) {
 
             if (c) {
                 premiumUser->agregarCancionFavorita(c);
-                cout << "Cancion '" << c->getTitulo() << "' agregada a favoritos." << endl;
+                cout << " Cancion '" << c->getTitulo() << "' agregada a favoritos." << endl;
             } else {
-                cout << "Error: Cancion con ID " << idCancion << " no encontrada en UdeATunes." << endl;
+                cout << " Error: Cancion con ID " << idCancion << " no encontrada en UdeATunes." << endl;
             }
         }
         else if (opcion == "2") {
@@ -534,9 +537,9 @@ void UdeATunes::gestionarFavoritos(Usuario* usuario) {
             cin >> idCancion;
 
             if (premiumUser->quitarCancionFavorita(idCancion)) {
-                cout << "Cancion con ID " << idCancion << " eliminada de favoritos." << endl;
+                cout << " Cancion con ID " << idCancion << " eliminada de favoritos." << endl;
             } else {
-                cout << "Error: La cancion no se encontro en su lista o el ID es invalido." << endl;
+                cout << " Error: La cancion no se encontro en su lista o el ID es invalida." << endl;
             }
         }
         else if (opcion == "3") {
@@ -566,7 +569,7 @@ void UdeATunes::gestionarSeguimiento(Usuario* usuario) {
     // DYNAMIC CAST OBLIGATORIO
     UsuarioPremium* p = dynamic_cast<UsuarioPremium*>(usuario);
     if (p == nullptr) {
-        cout << "Error: Solo los usuarios Premium pueden gestionar seguimientos." << endl;
+        cout << " Error: Solo los usuarios Premium pueden gestionar seguimientos." << endl;
         return;
     }
 
@@ -605,12 +608,12 @@ void UdeATunes::gestionarSeguimiento(Usuario* usuario) {
             // La persona a seguir debe ser Premium y no ser el mismo usuario
             if (p_a_seguir && p_a_seguir != p) {
                 p->seguirA(p_a_seguir);
-                cout << "Ahora sigues a " << p_a_seguir->getNickname() << "!" << endl;
+                cout << " Ahora sigues a " << p_a_seguir->getNickname() << "!" << endl;
             } else {
-                cout << "Error: ID encontrado, pero no es un usuario Premium valido para seguir." << endl;
+                cout << " Error: ID encontrado, pero no es un usuario Premium valida para seguir." << endl;
             }
         } else {
-            cout << "Error: No se encontro un usuario con ese ID." << endl;
+            cout << " Error: No se encontro un usuario con ese ID." << endl;
         }
     }
     else if (opcion == "2") {
@@ -635,7 +638,7 @@ void UdeATunes::gestionarSeguimiento(Usuario* usuario) {
 void UdeATunes::guardarUsuarios(const string& ruta) const {
     ofstream file(ruta);
     if (!file.is_open()) {
-        cerr << "Error: No se pudo abrir el archivo de usuarios para guardar: " << ruta << endl;
+        cerr << " Error: No se pudo abrir el archivo de usuarios para guardar: " << ruta << endl;
         return;
     }
 
@@ -684,7 +687,7 @@ void UdeATunes::guardarUsuarios(const string& ruta) const {
     }
 
     file.close();
-    cout << "\n[Persistencia] Los cambios de seguimiento y favoritos se guardaron en " << ruta << endl;
+    cout << "\n [Persistencia] Los cambios de seguimiento y favoritos se guardaron en " << ruta << endl;
 }
 void UdeATunes::listarUsuarios() const {
     cout << "\n=======================================" << endl;
@@ -712,7 +715,7 @@ void UdeATunes::listarUsuarios() const {
 void UdeATunes::guardarCanciones(const string& ruta) const {
     ofstream file(ruta);
     if (!file.is_open()) {
-        cerr << "Error: No se pudo abrir el archivo de canciones para guardar: " << ruta << endl;
+        cerr << " Error: No se pudo abrir el archivo de canciones para guardar: " << ruta << endl;
         return;
     }
 
@@ -730,13 +733,13 @@ void UdeATunes::guardarCanciones(const string& ruta) const {
     }
 
     file.close();
-    cout << "\n[Persistencia] El conteo de reproducciones se guardo en " << ruta << endl;
+    cout << "\n [Persistencia] El conteo de reproducciones se guardo en " << ruta << endl;
 }
 
 
 void UdeATunes::sesionReproduccion(Usuario* usuario, const Lista<Cancion*>& lista, bool aleatorio) {
     if (lista.tamanio() == 0) {
-        cout << "La lista de reproduccion esta vacia." << endl;
+        cout << " La lista de reproduccion esta vacia." << endl;
         return;
     }
 
@@ -750,7 +753,7 @@ void UdeATunes::sesionReproduccion(Usuario* usuario, const Lista<Cancion*>& list
 
     int indiceActual = aleatorio ? (rand() % lista.tamanio()) : 0;
 
-    // Funcion auxiliar para obtener la siguiente cancion
+    // funcion auxiliar para obtener la siguiente cancion
     auto obtenerSiguienteCancion = [&](int& index) -> Cancion* {
         if (aleatorio) {
             index = rand() % lista.tamanio();
@@ -833,25 +836,25 @@ void UdeATunes::sesionReproduccion(Usuario* usuario, const Lista<Cancion*>& list
             sesionActiva = false; // Usamos la variable de estado
         } else if (opcion == "1") { // Iniciar/Detener
             reproduccionActiva = !reproduccionActiva;
-            cout << (reproduccionActiva ? "Reproduccion REANUDADA." : "Reproduccion DETENIDA.") << endl;
+            cout << (reproduccionActiva ? " Reproduccion REANUDADA." : " Reproduccion DETENIDA.") << endl;
         } else if (opcion == "2") { // Siguiente
-            cout << "Pasando a la siguiente cancion..." << endl;
+            cout << " Pasando a la siguiente cancion..." << endl;
             cancionActual = obtenerSiguienteCancion(indiceActual);
             modoRepetir = false;
         } else if (opcion == "3" && usuario->getTipo() == "Premium") { // Previa (Premium)
             if (historial.size() > 1) {
                 historial.pop_back();
                 cancionActual = historial.back();
-                cout << "Volviendo a la cancion previa: " << cancionActual->getTitulo() << endl;
+                cout << " Volviendo a la cancion previa: " << cancionActual->getTitulo() << endl;
                 modoRepetir = false;
             } else {
-                cout << "No hay canciones previas disponibles." << endl;
+                cout << " No hay canciones previas disponibles." << endl;
             }
         } else if (opcion == "4" && usuario->getTipo() == "Premium") { // Repetir (Premium)
             modoRepetir = !modoRepetir;
-            cout << (modoRepetir ? "Modo REPETIR ACTIVADO." : "Modo REPETIR DESACTIVADO.") << endl;
+            cout << (modoRepetir ? " Modo REPETIR ACTIVADO." : " Modo REPETIR DESACTIVADO.") << endl;
         } else {
-            cout << "Opcion invalida o no permitida para su tipo de usuario." << endl;
+            cout << " Opcion invalida o no permitida para su tipo de usuario." << endl;
         }
 
         // 7. Avance automatico (Solo si esta activo y NO esta en modo repetir)
@@ -870,7 +873,53 @@ void UdeATunes::reproducirRandom(Usuario* usuario) {
     // Llama al metodo interactivo para la reproduccion aleatoria de la lista completa.
     sesionReproduccion(usuario, canciones, true);
 }
+void UdeATunes::reproducirFavoritosSeguidos(Usuario* usuario) {
+    // 1. Verificar que sea Premium y que este siguiendo a alguien
+    UsuarioPremium* up = dynamic_cast<UsuarioPremium*>(usuario);
+    if (!up) {
+        cout << " Solo los usuarios Premium pueden reproducir favoritos de un usuario seguido." << endl;
+        return;
+    }
 
+    UsuarioPremium* seguido = up->getSiguiendoA();
+    if (!seguido) {
+        cout << " No esta siguiendo a ningun otro usuario Premium. No se puede iniciar la reproduccion." << endl;
+        return;
+    }
+
+    const Lista<Cancion*>& listaFavoritosSeguido = seguido->getFavoritas();
+
+    if (listaFavoritosSeguido.tamanio() == 0) {
+        cout << " La lista de favoritos de @" << seguido->getNickname() << " esta vacia. No se puede iniciar la reproduccion." << endl;
+        return;
+    }
+
+    // 2. SELECCION DE ORDEN (Ordenada o Aleatoria)
+    string opcionOrden;
+    bool aleatorio = false;
+
+    while (true) {
+        cout << "\nComo desea reproducir los favoritos de @" << seguido->getNickname() << "?" << endl;
+        cout << "1. Ordenada" << endl;
+        cout << "2. Aleatoria" << endl;
+        cout << "Ingrese opcion: ";
+        cin >> opcionOrden;
+
+        if (opcionOrden == "1") {
+            aleatorio = false;
+            break;
+        } else if (opcionOrden == "2") {
+            aleatorio = true;
+            break;
+        } else {
+            cout << " Opcion invalida. Intente de nuevo." << endl;
+        }
+    }
+
+    // 3. Llamar a la sesion de reproduccion
+    cout << "\n Iniciando reproduccion de 'Favoritos de " << seguido->getNickname() << "'..." << endl;
+    sesionReproduccion(usuario, listaFavoritosSeguido, aleatorio);
+}
 // =======================================================
 // REPRODUCIR LISTA DE FAVORITOS (Opcion 4 del menu)
 // =======================================================
@@ -883,7 +932,7 @@ void UdeATunes::reproducirFavoritos(Usuario* usuario) {
     const Lista<Cancion*>& favoritos = canciones; // Usamos la lista completa por ahora (Placeholder)
 
     if (favoritos.tamanio() == 0) {
-        cout << "Su lista de favoritos esta vacia." << endl;
+        cout << " Su lista de favoritos esta vacia." << endl;
         return;
     }
 
@@ -905,7 +954,7 @@ void UdeATunes::reproducirFavoritos(Usuario* usuario) {
             aleatorio = true;
             break;
         } else {
-            cout << "Opcion invalida. Intente de nuevo." << endl;
+            cout << " Opcion invalida. Intente de nuevo." << endl;
         }
     }
 

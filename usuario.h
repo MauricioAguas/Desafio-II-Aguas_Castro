@@ -33,4 +33,5 @@ public:
     // Nuevo setter temporal
     void setIdSeguidoTemporal(int idSeg) { idSeguidoTemporal = idSeg; }
     int getIdSeguidoTemporal() const { return idSeguidoTemporal; }
+    virtual void mostrarInfo() const = 0;
 };

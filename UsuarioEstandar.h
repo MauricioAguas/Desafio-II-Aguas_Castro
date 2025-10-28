@@ -11,4 +11,7 @@ public:
     string obtenerCalidadAudio() const override {
         return "128 kbps (Calidad Estándar)";
     }
+    void mostrarInfo() const override {
+        cout << "Usuario Estandar: " << nickname << " (" << ciudad << ", " << pais << ")\n";
+    }
 };

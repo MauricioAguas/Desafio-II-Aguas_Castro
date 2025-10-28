@@ -15,8 +15,12 @@
 #include "anuncio.h"
 #include "UsuarioEstandar.h"
 #include "UsuarioPremium.h"
-
+#include "TiempoPausa.h"
+#include "InterfazVisual.h"
+#include <list>
 using namespace std;
+// Constantes
+const int MAX_HISTORIAL_PREMIUM = 5; // Índice 0 es la canción actual, hasta 4 previas.
 
 class UdeATunes {
 private:
@@ -26,6 +30,9 @@ private:
     Lista<Usuario*> usuarios;
     Lista<Anuncio*> anuncios;
     int ultimoAnuncioId;
+    int ultimoIdTemporalCancion;
+    // Método auxiliar para la lógica de reproducción interactiva
+    void sesionReproduccion(Usuario* usuario, const Lista<Cancion*>& lista, bool aleatorio);
 public:
     UdeATunes();
     ~UdeATunes();
@@ -49,6 +56,14 @@ public:
     Anuncio* obtenerAnuncioAleatorio();
     Usuario* iniciarSesion(const string& nickname);
     void reproducirRandom(Usuario* usuario);
-
-
+    Cancion* buscarCancionPorId(int id);
+    void gestionarFavoritos(Usuario* usuario);
+    void gestionarSeguimiento(Usuario* usuario);
+    void guardarUsuarios(const string& ruta) const;
+    void listarUsuarios() const;
+    void reproducirLista(Usuario* usuario, const Lista<Cancion*>& lista, bool aleatorio); // NUEVA AUXILIAR
+    void reproducirFavoritos(Usuario* usuario);
+    void guardarCanciones(const string& ruta) const;
+    Album* buscarAlbumPorId(int id);
+    Artista* buscarArtistaPorId(int id);
 };

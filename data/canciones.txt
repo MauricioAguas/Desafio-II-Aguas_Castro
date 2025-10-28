@@ -1,14 +1,14 @@
-1;Runaway;215;1;Musica/Runaway
-2;Lost Stars;245;1;Musica/LostStars
-3;Hysteria;280;2;Musica/Hysteria
-4;Uprising;295;2;Musica/Uprising
-5;Imagine;187;3;Musica/Imagine
-6;Hey Jude;431;3;Musica/HeyJude
-7;Yesterday;145;3;Musica/Yesterday
-8;Shape of You;234;4;Musica/ShapeOfYou
-9;Perfect;263;4;Musica/Perfect
-10;Photograph;258;4;Musica/Photograph
-11;andre;320;5;Musica/andrea
-12;tiro la piedra;180;5;musica/tiro la piedra
-13;tiro;180;5;musica/tiro
-14;tiro la;180;5;musica/tiro la
+1;Runaway;215;1;Musica/Runaway;11
+2;Lost Stars;245;1;Musica/LostStars;12
+3;Hysteria;280;2;Musica/Hysteria;13
+4;Uprising;295;2;Musica/Uprising;10
+5;Imagine;187;3;Musica/Imagine;15
+6;Hey Jude;431;3;Musica/HeyJude;9
+7;Yesterday;145;3;Musica/Yesterday;12
+8;Shape of You;234;4;Musica/ShapeOfYou;20
+9;Perfect;263;4;Musica/Perfect;14
+10;Photograph;258;4;Musica/Photograph;11
+11;andre;320;5;Musica/andrea;0
+12;tiro la piedra;180;5;musica/tiro la piedra;0
+13;tiro;180;5;musica/tiro;5
+14;tiro la;180;5;musica/tiro la;10

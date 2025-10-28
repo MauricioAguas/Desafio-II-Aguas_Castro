@@ -1,4 +1,5 @@
-1;juanito123;Estandar;Medellin;Colombia;2023-02-15;
-2;maria_premium;Premium;Bogota;Colombia;2022-07-03;4
-3;sofia_rock;Estandar;Lima;Peru;2024-01-21;
-4;andre_premium;Premium;Quito;Ecuador;2023-08-30;
+1;juanito123;Estandar;Medellin;Colombia;2023-02-15;;
+2;maria_premium;Premium;Bogota;Colombia;2022-07-03;;10101,40410,20204
+3;sofia_rock;Estandar;Lima;Peru;2024-01-21;;
+4;andre_premium;Premium;Quito;Ecuador;2023-08-30;;
+5;nuevo_premium;Premium;Miami;USA;2024-10-27;;50512,10101

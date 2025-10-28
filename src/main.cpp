@@ -1,10 +1,21 @@
 #include <iostream>
 #include <string>
-#include <limits>
 #include "UdeATunes.h"
-#include "MenuInteractivo.h"
+#include "Usuario.h"
 
 using namespace std;
+
+static void mostrarMenuBasico(Usuario* u) {
+    cout << "\n==============================================" << endl;
+    cout << "  UdeATunes - Usuario: " << u->getNickname() << " (" << u->getTipo() << ")" << endl;
+    cout << "==============================================" << endl;
+    cout << "1. Reproducir 5 canciones aleatorias" << endl;
+    cout << "2. Favoritos (Premium)" << endl;
+    cout << "3. Seguimiento (Premium)" << endl;
+    cout << "4. Resumen del sistema" << endl;
+    cout << "0. Cerrar sesion" << endl;
+    cout << "Opcion: ";
+}
 
 int main() {
     srand(time(0));
@@ -18,58 +29,53 @@ int main() {
     app.cargarAnuncios(RUTA_BASE + "anuncios.txt");
     app.vincular();
 
-    while (true) {  // Bucle externo para volver al login tras cerrar sesion
+    while (true) {
         Usuario* usuarioActual = nullptr;
-        string nickname;
+        string nick;
 
         while (usuarioActual == nullptr) {
-            cout << "Ingrese su Nickname para iniciar sesion (o 'salir'): ";
-            cin >> nickname;
-
-            if (nickname == "salir" || nickname == "SALIR") {
-                cout << "Cerrando UdeATunes... Hasta pronto!" << endl;
+            cout << "\nInicio de sesion" << endl;
+            cout << "Ingrese nickname (o 'salir'): ";
+            cin >> nick;
+            if (nick == "salir" || nick == "SALIR") {
+                cout << "Cerrando UdeATunes..." << endl;
                 return 0;
             }
-
-            usuarioActual = app.iniciarSesion(nickname);
-
-            if (usuarioActual == nullptr) {
-                cout << "\nERROR: Nickname no encontrado. Intente de nuevo.\n" << endl;
-            } else {
-                cout << "\nSesion iniciada con exito! Bienvenido, "
-                     << usuarioActual->getNickname() << " (" << usuarioActual->getTipo() << ")." << endl;
-            }
+            usuarioActual = app.iniciarSesion(nick);
+            if (!usuarioActual) cout << "Nickname no encontrado." << endl;
         }
 
-        int opcion = -1;
-        cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // limpiar buffer
+        int op = -1;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
         while (true) {
-            MenuInteractivo::mostrarMenuPrincipal(usuarioActual);
-            cout << "\nIngrese su opcion: ";
-            if (!(cin >> opcion)) {
+            mostrarMenuBasico(usuarioActual);
+            if (!(cin >> op)) {
                 cin.clear();
-                cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                cout << "Entrada invalida. Intente de nuevo." << endl;
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cout << "Entrada invalida." << endl;
                 continue;
             }
-            cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // limpiar buffer
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-            if (opcion == 1) {
+            if (op == 1) {
                 app.reproducirRandom(usuarioActual);
-                cout << "\nPresione Enter para continuar...";
+                cout << "Presione Enter para continuar...";
                 cin.get();
                 continue;
-            }
-
-            bool salir = MenuInteractivo::procesarOpcion(opcion, usuarioActual);
-            if (salir) {
-                cout << "\nCerrando sesion de " << usuarioActual->getNickname() << "... Adios." << endl;
-                usuarioActual = nullptr;
+            } else if (op == 2) {
+                app.gestionarFavoritos(usuarioActual);
+            } else if (op == 3) {
+                app.gestionarSeguimiento(usuarioActual);
+            } else if (op == 4) {
+                app.mostrarResumen();
+            } else if (op == 0) {
+                cout << "Cerrando sesion de " << usuarioActual->getNickname() << endl;
                 break;
+            } else {
+                cout << "Opcion invalida." << endl;
             }
         }
     }
-
     return 0;
 }

@@ -340,143 +340,156 @@ Usuario* UdeATunes::iniciarSesion(const string& nickname) {
     return nullptr;
 }
 Cancion* UdeATunes::buscarCancionPorId(int id) {
-    // Retorna la posicion de la cancion con ese ID, o -1 si no la encuentra.
-    int posicion = canciones.buscarPorId(id);
-
-    // El metodo buscarPorId de Lista debe estar implementado para que funcione
-
-    if (posicion != -1) {
-        // Si se encontro, retorna el puntero a la cancion
-        return canciones.obtener(posicion);
+    for (int i = 0; i < canciones.tamanio(); ++i) {
+        Cancion* c = canciones.obtener(i);
+        // Compara con el ID final (que fue asignado en vincular())
+        if (c->getId() == id) {
+            return c;
+        }
     }
-
-    // Si no se encontro
-    return nullptr;
+    return nullptr; // No encontrada
 }
 // =======================================================
 // VINCULAR ENTIDADES POR ID
 // Canciones → Albumes → Artistas → Usuarios
 // =======================================================
+// =======================================================
+// 🔹 VINCULACIÓN DE RELACIONES Y GENERACIÓN DE ID FINAL
+// =======================================================
 void UdeATunes::vincular() {
-    // Album -> Cancion
-    cout << "[VINCULACION] Albumes <-> Canciones..." << endl;
-    for (int i = 0; i < albumes.tamanio(); ++i) {
-        Album* alb = albumes.obtener(i);
-        for (int j = 0; j < alb->getCancionesIDs().tamanio(); ++j) {
-            int idC = *(alb->getCancionesIDs().obtener(j));
+    cout << "\n--- Iniciando Vinculación de Relaciones ---" << endl;
 
-            // Buscar la cancion por su ID TEMPORAL (el que viene en el archivo)
-            // Se debe iterar sobre la lista global, ya que la lista::buscarPorId
-            // ahora buscaria el ID de 9 digitos, que aun no existe.
-
-            // SOLUCION PARA BUSQUEDA TEMPORAL:
-            // Dado que Lista::buscarPorId usa el ID final, debemos hacer una busqueda lineal
-            // para el ID temporal, asumiendo que el ID temporal es unico por ahora
-            // y corresponde al 'id' de la cancion en el archivo.
-
-            // NOTA: Para este ejemplo, asumiremos que el ID TEMPORAL de la cancion
-            // es unico y que la busqueda puede hacerse recorriendo la lista global,
-            // hasta que la parte del ID temporal y la parte del ID album coincidan.
-            // Para mantener el codigo simple, buscaremos por el ID del Album
-            // y luego por el ID temporal de la cancion dentro del album vinculado:
-
-            // Busqueda de la cancion en la lista global con el idAlbum
-            for (int k = 0; k < canciones.tamanio(); ++k) {
-                Cancion* can = canciones.obtener(k);
-                if (can->getIdAlbum() == alb->getId() && can->getIdTemporal() == idC) {
-                    alb->agregarCancion(can); // Vincula el puntero real al Album
+    // --- FASE 1: VINCULACIÓN ARTISTA <-> ALBUM ---
+    cout << "Vinculando Álbumes a Artistas..." << endl;
+    for (int i = 0; i < artistas.tamanio(); ++i) {
+        Artista* artista = artistas.obtener(i);
+        const Lista<int*>& albumesIDs = artista->getAlbumesIDs();
+        for (int j = 0; j < albumesIDs.tamanio(); ++j) {
+            int idAlbumBuscado = *albumesIDs.obtener(j);
+            for (int k = 0; k < albumes.tamanio(); ++k) {
+                Album* album = albumes.obtener(k);
+                if (album->getId() == idAlbumBuscado) {
+                    artista->agregarAlbum(album);
                     break;
                 }
             }
         }
     }
-    cout << "[VINCULACION] Artistas <-> Albumes..." << endl;
 
-    // Artista -> Album (Se mantiene tu logica original)
-    for (int i = 0; i < artistas.tamanio(); ++i) {
-        Artista* art = artistas.obtener(i);
-        for (int j = 0; j < art->getAlbumesIDs().tamanio(); ++j) {
-            int idA = *(art->getAlbumesIDs().obtener(j));
-            int posA = albumes.buscarPorId(idA);
-            if (posA != -1)
-                art->agregarAlbum(albumes.obtener(posA));
-        }
-    }
-
-    // Usuarios Premium seguidos (Se mantiene tu logica original)
-    cout << "[VINCULACION] Usuarios Premium seguidos..." << endl;
-    for (int i = 0; i < usuarios.tamanio(); ++i) {
-        Usuario* u = usuarios.obtener(i);
-        UsuarioPremium* p = dynamic_cast<UsuarioPremium*>(u);
-        if (!p) continue;
-        // ... (resto de la logica de seguimiento) ...
-    }
-
-    // GENERACION DE ID FINAL DE 9 DIGITOS (CRITICO)
-    // ID = ID_Artista(5) + ID_Album(2) + ID_Cancion(2)
-    cout << "[VINCULACION] Generando IDs finales de 9 digitos (Artista-Album-Cancion)..." << endl;
-
+    // --- FASE 2: VINCULACIÓN ALBUM <-> CANCION ---
+    cout << "Vinculando Canciones a Álbumes..." << endl;
     for (int i = 0; i < albumes.tamanio(); ++i) {
-        Album* alb = albumes.obtener(i);
-
-        // 1. Obtener ID del Artista (Componente de 5 digitos)
-        int idArtista = alb->getIdArtista();
-        int posArt = artistas.buscarPorId(idArtista);
-        if (posArt == -1) continue;
-        Artista* art = artistas.obtener(posArt);
-        int baseIDArtista = art->getId(); // ID del Artista (ej: 1)
-
-        // 2. Obtener ID del Album (Componente de 2 digitos)
-        int baseIDAlbum = alb->getId();     // ID del Album (ej: 2)
-
-        // 3. Iterar sobre las canciones ya vinculadas al Album
-        for (int j = 0; j < alb->getCanciones().tamanio(); ++j) {
-            Cancion* cancion = alb->getCanciones().obtener(j);
-
-            // 4. Obtener ID Temporal de la Cancion (Componente de 2 digitos)
-            int idCancionTemporal = cancion->getIdTemporal(); // ID de la cancion en el archivo (ej: 3)
-
-            // 5. Calculo del ID de 9 digitos:
-            // Desplazamos el ID de Artista 4 posiciones (x 10000)
-            // Desplazamos el ID de Album 2 posiciones (x 100)
-            int nuevoID = (baseIDArtista * 10000) + (baseIDAlbum * 100) + idCancionTemporal;
-
-            // 6. Asignar el ID final a la cancion (para que futuras busquedas funcionen)
-            cancion->setID(nuevoID);
-
-            // EJEMPLO: Artista 1, Album 2, Cancion 3 -> ID: 000010203 (Si los IDs son de 1 digito)
-            // Para el ejemplo Artista 1, Album 1, Cancion 1: (1*10000) + (1*100) + 1 = 10101
-            // Si Artista 10, Album 20, Cancion 30: (10*10000) + (20*100) + 30 = 100000 + 2000 + 30 = 102030 (6 digitos)
-        }
-    }
-    cout << "[VINCULACION] IDs de 9 digitos generados correctamente." << endl;
-    cout << "[VINCULACION] Listas de Favoritos..." << endl;
-    for (int i = 0; i < usuarios.tamanio(); ++i) {
-        Usuario* u = usuarios.obtener(i);
-        UsuarioPremium* p = dynamic_cast<UsuarioPremium*>(u);
-
-        if (!p) continue;
-
-        const Lista<int*>& favIds = p->getFavoritosIDs();
-
-        for (int j = 0; j < favIds.tamanio(); ++j) {
-            int id9Digitos = *favIds.obtener(j);
-
-            // Usamos la funcion que creamos (buscarCancionPorId)
-            Cancion* c = buscarCancionPorId(id9Digitos);
-
-            if (c) {
-                p->agregarCancionFavorita(c); // Agrega el puntero real
-            } else {
-                cerr << "AVISO: Cancion con ID " << id9Digitos
-                     << " de favoritos de " << p->getNickname() << " no fue encontrada (datos corruptos?)." << endl;
+        Album* album = albumes.obtener(i);
+        const Lista<int*>& cancionesIDs = album->getCancionesIDs();
+        for (int j = 0; j < cancionesIDs.tamanio(); ++j) {
+            int idCancionBuscado = *cancionesIDs.obtener(j);
+            for (int k = 0; k < canciones.tamanio(); ++k) {
+                Cancion* cancion = canciones.obtener(k);
+                // NOTA: La Cancion almacena el idAlbum. Usamos ese para la búsqueda.
+                // En este caso, el ID buscado es el ID TEMPORAL de la canción.
+                if (cancion->getIdTemporal() == idCancionBuscado && cancion->getIdAlbum() == album->getId()) {
+                    album->agregarCancion(cancion);
+                    break;
+                }
             }
         }
-        // Opcional: limpiar la lista temporal de IDs despues de vincular
-        // p->getFavoritosIDs().limpiar();
     }
-}
 
+
+    // --- FASE 3: GENERACIÓN del ID FINAL de 9 DÍGITOS para CADA CANCIÓN ---
+    cout << "Generando ID final de 9 dígitos para cada Canción..." << endl;
+    for (int i = 0; i < canciones.tamanio(); ++i) {
+        Cancion* cancion = canciones.obtener(i);
+        int idCancionTemp = cancion->getIdTemporal();
+        int idAlbum = cancion->getIdAlbum();
+        int idArtista = 0;
+        string nombreAlbum = "Desconocido";
+
+        // 1. Encontrar el Album para obtener el idArtista y el nombre
+        Album* albumEncontrado = nullptr;
+        for (int j = 0; j < albumes.tamanio(); ++j) {
+            Album* album = albumes.obtener(j);
+            if (album->getId() == idAlbum) {
+                albumEncontrado = album;
+                break;
+            }
+        }
+
+        if (albumEncontrado) {
+            idArtista = albumEncontrado->getIdArtista();
+            nombreAlbum = albumEncontrado->getTitulo();
+
+            // 2. Calcular el ID final (ID Artista * 1000 + ID Album * 100 + ID Cancion Temporal)
+            // Esto garantiza un ID de 9 dígitos asumiendo IDs de 3 dígitos (999, 99, 99)
+            // Si Artista tiene 1 o 2 dígitos, y Album/Canción 1 o 2, el ID será de 6 a 9 dígitos.
+            // Para asegurar los 9 dígitos, se usaría multiplicación por potencias de 1000.
+            // PERO: La fórmula proporcionada es: idArtista*1000 + idAlbum*100 + idCancionTemporal
+            // Si la fórmula debe generar 9 dígitos (ej: 001001001), la fórmula real sería:
+            // ID = idArtista*1000000 + idAlbum*1000 + idCancionTemporal
+            // Ya que el enunciado dice que el ID final *es* esa suma, lo implementamos tal cual.
+            long long int idFinal = idArtista * 10000 + idAlbum * 100 + idCancionTemp;
+
+            // 3. Asignar el ID final a la canción
+            cancion->setID(idFinal);
+
+            // Ejemplo de depuración:
+            // cout << "-> Cancion: " << cancion->getTitulo()
+            //      << ", TempID: " << idCancionTemp
+            //      << ", AlbumID: " << idAlbum
+            //      << ", ArtistaID: " << idArtista
+            //      << ", ID FINAL: " << idFinal << endl;
+        } else {
+            cerr << "⚠️ Error de vinculación: No se encontró el álbum ID " << idAlbum << " para la canción " << cancion->getTitulo() << endl;
+        }
+    }
+
+
+    // --- FASE 4: VINCULACIÓN USUARIOS (FAVORITOS y SEGUIDOS) ---
+    cout << "Vinculando Usuarios (Favoritos y Seguidos)..." << endl;
+
+    // Vinculación de Seguidos (solo para Premium)
+    for (int i = 0; i < usuarios.tamanio(); ++i) {
+        Usuario* user = usuarios.obtener(i);
+        if (user->getTipo() == "Premium") {
+            UsuarioPremium* premiumUser = dynamic_cast<UsuarioPremium*>(user);
+            int idSeguidoTemp = premiumUser->getIdSeguidoTemporal();
+
+            if (idSeguidoTemp != -1) {
+                for (int j = 0; j < usuarios.tamanio(); ++j) {
+                    Usuario* otroUser = usuarios.obtener(j);
+                    if (otroUser->getId() == idSeguidoTemp && otroUser->getTipo() == "Premium") {
+                        premiumUser->seguirA(dynamic_cast<UsuarioPremium*>(otroUser));
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    // Vinculación de Favoritos (solo para Premium)
+    for (int i = 0; i < usuarios.tamanio(); ++i) {
+        Usuario* user = usuarios.obtener(i);
+        if (user->getTipo() == "Premium") {
+            UsuarioPremium* premiumUser = dynamic_cast<UsuarioPremium*>(user);
+            const Lista<int*>& favoritosIDs = premiumUser->getFavoritosIDs();
+
+            for (int j = 0; j < favoritosIDs.tamanio(); ++j) {
+                int idFinalBuscado = *favoritosIDs.obtener(j);
+                Cancion* cancionFavorita = buscarCancionPorId(idFinalBuscado); // Buscar por ID final
+
+                if (cancionFavorita) {
+                    premiumUser->agregarCancionFavorita(cancionFavorita);
+                } else {
+                    cerr << "⚠️ Error: Canción con ID final " << idFinalBuscado << " no encontrada para favoritos." << endl;
+                }
+            }
+            // Importante: liberar los IDs temporales si ya no se usarán
+            // En este caso, la clase UsuarioPremium es responsable de liberar sus int*
+        }
+    }
+
+    cout << "--- Vinculación Completa ---" << endl;
+}
 // =======================================================
 // GESTION DE LISTA DE FAVORITOS (Solo Premium)
 // =======================================================
@@ -804,8 +817,8 @@ void UdeATunes::sesionReproduccion(Usuario* usuario, const Lista<Cancion*>& list
             usuario->getTipo(),
             reproduccionActiva,
             historial.size() > 1,
-            modoRepetir
-            );
+            modoRepetir,
+            cancionActual->getId());
 
         // 5. Simulacion de la duracion y Manejo de la Interaccion del Usuario
         // La simulacion de tiempo y la entrada del usuario deben ocurrir si la reproduccion esta activa.
